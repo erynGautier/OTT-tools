@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Engineer Pairings Generator</title>
+</head>
+
+<body>
+  <div>
+    <button id="checkAllBtn">Check all</button>
+    <button id="getPairsBtn">Get pairings</button>
+
+    <div id="checkboxes"></div>
+    <div id="results"></div>
+  </div>
+
+  <script>
+    function createCheckboxes(names) {
+      const html = names.map(name => `<label for="${name}">
+                <input type="checkbox" name="name" id="${name}" value="${name}"> ${name}
+                <span></span>
+            </label>`
+      ).join(' ');
+      document.querySelector("#checkboxes").innerHTML += html;
+    }
+
+    function check(checked = true) {
+      const checkboxes = document.querySelectorAll('input[name="name"]');
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = checked;
+      });
+
+      if (checked) {
+        checkAllBtn.textContent = "Uncheck all"
+      } else {
+        checkAllBtn.textContent = "Check all"
+      }
+    }
+
+    function checkAll() {
+      check();
+      this.onclick = uncheckAll;
+    }
+
+    function uncheckAll() {
+      check(false);
+      this.onclick = checkAll;
+    }
+
+    function createPairVisuals(pairs) {
+      pairs.forEach(
+        (pair) => {
+          let html = `<p>${pair[0]} < - > ${pair[1]}</p>`
+          document.querySelector("#results").innerHTML += html;
+        }
+      )
+    }
+
+    function getRandomName(names) {
+      return names[Math.floor(Math.random() * names.length)]
+    }
+
+    function removeName(names, name) {
+      names.splice(names.indexOf(name), 1);
+    }
+
+    function generatePairs(names) {
+      let notPaired = names.map((x) => x);
+      let pairs = [];
+      let partner = "";
+
+      names.forEach(
+        (name) => {
+          if (notPaired.includes(name)) {
+            removeName(notPaired, name);
+
+            if (notPaired.length > 0) {
+              partner = getRandomName(notPaired);
+              removeName(notPaired, partner);
+            } else {
+              partner = name;
+              while (partner == name) {
+                partner = getRandomName(names);
+              }
+            }
+
+            pairs.push([name, partner])
+          }
+        }
+      )
+
+      return pairs;
+    }
+
+    const names = ["Dennis", "Eryn", "Emmanuel", "Jared", "Mary", "Mo", "Max", "Ian"];
+    createCheckboxes(names);
+
+    const checkAllBtn = document.querySelector('#checkAllBtn');
+    checkAllBtn.onclick = checkAll;
+
+    const getPairsBtn = document.querySelector('#getPairsBtn');
+    getPairsBtn.addEventListener('click', (event) => {
+      let checkboxes = document.querySelectorAll('input[name="name"]:checked');
+      let participants = [];
+      let results = [];
+
+      checkboxes.forEach((checkbox) => {
+        participants.push(checkbox.value);
+      });
+
+      document.querySelector("#results").innerHTML = ``;
+
+      if (participants.length != 0) {
+        getPairsBtn.textContent = "Refresh pairings";
+        results = generatePairs(participants);
+        createPairVisuals(results);
+      } else {
+        getPairsBtn.textContent = "Get pairings";
+      }
+    });
+  </script>
+
+  <style>
+    body {
+      font-family: default;
+      width: fit-content;
+    }
+
+    label {
+      display: block;
+      position: relative;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+
+    button {
+      background-color: white;
+      color: black;
+      border: 2px solid rgba(152,152,152,255);
+      padding: 15px 32px;
+      text-align: center;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    button:hover {
+      transition-duration: 0.4s;
+      box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    }
+
+    #checkboxes, #results {
+      margin-top: 3em;
+    }
+  </style>
+</body>
+
+</html>
