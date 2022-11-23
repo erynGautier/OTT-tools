@@ -53,7 +53,7 @@
     function createPairVisuals(pairs) {
       pairs.forEach(
         (pair) => {
-          let html = `<p>${pair[0]} < - > ${pair[1]}</p>`
+          let html = `<p>${pair[0]} &harr; ${pair[1]}</p>`
           document.querySelector("#results").innerHTML += html;
         }
       )
